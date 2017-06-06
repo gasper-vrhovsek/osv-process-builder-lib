@@ -1,3 +1,7 @@
 .idea
 target/
 OsvProcessBuilder.iml
+.jar
+.class
+.h
+.so
