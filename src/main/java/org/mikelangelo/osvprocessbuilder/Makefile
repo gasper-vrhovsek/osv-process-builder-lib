@@ -11,7 +11,7 @@ prepare:
 	mkdir -p $(DEST)
 
 $(DEST)/%.class: %.java
-	$(JAVAC) -cp ../../../ -d $(DEST) -target 8 -source 8 $^
+	$(JAVAC) -cp ../../../ -d $(DEST) -target 7 -source 7 $^
 
 clean:
 	rm -rf $(DEST)

@@ -2,10 +2,7 @@ package org.mikelangelo.osvprocessbuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Justin Cinkelj, Gasper Vrhovsek
@@ -20,6 +17,10 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
             throws NullPointerException {
         m_command = command;
         m_environment = new HashMap<String, String>();
+    }
+
+    public OsvProcessBuilder(String ... command) {
+        this(Arrays.asList(command));
     }
 
     // JNI
