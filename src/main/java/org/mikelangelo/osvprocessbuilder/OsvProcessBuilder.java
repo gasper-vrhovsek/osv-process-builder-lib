@@ -63,7 +63,13 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         }
 
         long[] thread_id = new long[]{0};
-        this.execve(path, argv, envp, thread_id, -1);
+//        this.execve(path, argv, envp, thread_id, -1);
+
+        // Trying to make it work on osv
+        argv[0] = "/java.so"; // replace standard java path
+        argv[3] = "";
+        this.execve("/java.so", argv, envp, thread_id, -1);
+
         OsvProcess proc = new OsvProcess(thread_id[0]);
         return proc;
     }
