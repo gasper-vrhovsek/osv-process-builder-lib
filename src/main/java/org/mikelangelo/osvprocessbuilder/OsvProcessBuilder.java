@@ -2,7 +2,10 @@ package org.mikelangelo.osvprocessbuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Justin Cinkelj, Gasper Vrhovsek
@@ -19,7 +22,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         m_environment = new HashMap<String, String>();
     }
 
-    public OsvProcessBuilder(String ... command) {
+    public OsvProcessBuilder(String... command) {
         this(Arrays.asList(command));
     }
 
@@ -32,7 +35,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         System.loadLibrary("OsvProcessBuilder");
     }
 
-//    // main
+    //    // main
     public static void main(String[] args) {
         OsvProcessBuilder pb = new OsvProcessBuilder(Arrays.asList(new String[]{"aa", "bb"}));
         long[] thread_id = new long[]{0};
@@ -67,8 +70,24 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
         // Trying to make it work on osv
         argv[0] = "/java.so"; // replace standard java path
-        argv[3] = "";
-        this.execve("/java.so", argv, envp, thread_id, -1);
+
+
+        // Remove element on 3, because java.so does not seem to understand it
+        String[] argvCopy = new String[argv.length - 1];
+
+        int i = 0, j = 0;
+        for (String arg : argv) {
+            if (i == 3) {
+                i++;
+                continue;
+            }
+            argvCopy[j] = arg;
+            i++;
+            j++;
+        }
+        // -----
+
+        this.execve("/java.so", argvCopy, envp, thread_id, -1);
 
         OsvProcess proc = new OsvProcess(thread_id[0]);
         return proc;
