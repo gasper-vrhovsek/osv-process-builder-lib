@@ -68,29 +68,37 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         long[] thread_id = new long[]{0};
 //        this.execve(path, argv, envp, thread_id, -1);
 
-        // Trying to make it work on osv
-        argv[0] = "/java.so"; // replace standard java path
-
-
         // Remove element on 3, because java.so does not seem to understand it
-        String[] argvCopy = new String[argv.length - 1];
+        String[] argvCopy = new String[argv.length];
 
-        int i = 0, j = 0;
+        int k = 0, j = 0;
         for (String arg : argv) {
-            if (i == 3) {
-                i++;
+            System.out.println("Original argv[" + k + "] = " + arg);
+            k++;
+            if (arg.equals("-Xmx1024M")) {
                 continue;
             }
-            argvCopy[j] = arg;
-            i++;
-            j++;
+            argvCopy[j++] = arg;
         }
-        // -----
 
-        this.execve("/java.so", argvCopy, envp, thread_id, -1);
+        // TODO temporary fix, this should be solved differently
+        if (argvCopy[0].contains("/bin/java")) {
+            argvCopy[0] = "/java.so"; // replace standard java path
+        }
 
-        OsvProcess proc = new OsvProcess(thread_id[0]);
-        return proc;
+        // Trim new array
+        String[] argNew = new String[j];
+        int i = 0;
+        for (String arg : argvCopy) {
+            if (arg != null) {
+                System.out.println("argv[" + i + "] = " + arg);
+                argNew[i++] = arg;
+            }
+        }
+
+        this.execve("/java.so", argNew, envp, thread_id, -1);
+
+        return new OsvProcess(thread_id[0]);
     }
 
     public File directory() {
