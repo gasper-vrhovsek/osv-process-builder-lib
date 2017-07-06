@@ -82,9 +82,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         }
 
         // TODO temporary fix, this should be solved differently
-        if (argvCopy[0].contains("/bin/java")) {
-            argvCopy[0] = "/java.so"; // replace standard java path
-        }
+//        if (argvCopy[0].contains("/bin/java")) {
+//            argvCopy[0] = "/java.so"; // replace standard java path
+//        }
 
         // Trim new array
         String[] argNew = new String[j];
@@ -96,7 +96,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
             }
         }
 
-        this.execve("/java.so", argNew, envp, thread_id, -1);
+        this.execve(argNew[0], argNew, envp, thread_id, -1);
 
         return new OsvProcess(thread_id[0]);
     }
