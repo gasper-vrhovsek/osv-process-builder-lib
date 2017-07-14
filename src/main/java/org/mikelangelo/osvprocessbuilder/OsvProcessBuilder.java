@@ -1,11 +1,16 @@
 package org.mikelangelo.osvprocessbuilder;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Justin Cinkelj, Gasper Vrhovsek
@@ -96,7 +101,23 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
             }
         }
 
-        this.execve("/java.so", argNew, envp, thread_id, -1);
+        // Sending a request to executor node
+        String executorUrl = "172.16.122.14/app/";
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPut put = new HttpPut(executorUrl);
+
+        List<NameValuePair> urlParams = new ArrayList<>();
+        urlParams.add(new BasicNameValuePair("command", String.join(" ", argNew)));
+
+        put.setEntity(new UrlEncodedFormEntity(urlParams));
+
+        HttpResponse httpResponse = httpClient.execute(put);
+
+        System.out.println(httpResponse.getStatusLine() + httpResponse.toString());
+        // end of test
+
+
+//        this.execve("/java.so", argNew, envp, thread_id, -1);
 
         return new OsvProcess(thread_id[0]);
     }
