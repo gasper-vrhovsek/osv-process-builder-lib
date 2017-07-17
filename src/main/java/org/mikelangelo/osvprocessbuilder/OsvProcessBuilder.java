@@ -4,6 +4,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
@@ -55,6 +56,12 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
     public OsvProcess start()
             throws IOException {
+
+        System.out.println("Entering start() method of OsvProcessBuilder.");
+
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        String executorIp = "172.16.122.14";
+
         //
         String path = m_command.get(0);
 
@@ -67,6 +74,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         for (String key : m_environment.keySet()) {
             //Worker worker = entry.getValue();
             envp[ii] = key + "=" + m_environment.get(key);
+            // setup env on executor node
+            setEnvironmentVariable(httpClient, executorIp, key, m_environment.get(key));
+
             ii++;
         }
 
@@ -102,10 +112,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         }
 
         // Sending a request to executor node
-        String executorUrl = "172.16.122.14/app/";
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPut put = new HttpPut(executorUrl);
+        String executorApUrl = executorIp + "/app/";
 
+        HttpPut put = new HttpPut(executorApUrl);
         List<NameValuePair> urlParams = new ArrayList<>();
         urlParams.add(new BasicNameValuePair("command", String.join(" ", argNew)));
 
@@ -119,7 +128,8 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
 //        this.execve("/java.so", argNew, envp, thread_id, -1);
 
-        return new OsvProcess(thread_id[0]);
+//        return new OsvProcess(thread_id[0]);
+        return new OsvProcess(Integer.MAX_VALUE);
     }
 
     public File directory() {
@@ -146,5 +156,19 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
     public boolean redirectErrorStream() {
         return false;
+    }
+
+    private void setEnvironmentVariable(HttpClient httpClient, String executorIp, String var, String val) throws IOException {
+        String executorEnvUrl = executorIp + "/env/";
+
+        HttpPost envPost = new HttpPost(executorEnvUrl);
+        List<NameValuePair> envUrlParams = new ArrayList<>();
+        envUrlParams.add(new BasicNameValuePair("var", var));
+        envUrlParams.add(new BasicNameValuePair("val", val));
+
+        envPost.setEntity(new UrlEncodedFormEntity(envUrlParams));
+        HttpResponse response = httpClient.execute(envPost);
+
+        System.out.println(response.toString());
     }
 }
