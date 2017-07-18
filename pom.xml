@@ -46,6 +46,79 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>com.alexkasko.maven</groupId>
+                <artifactId>jni-headers-maven-plugin</artifactId>
+                <version>1.0.6</version>
+
+                <executions>
+                    <execution>
+                        <id>javah</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>javah</goal>
+                        </goals>
+                        <configuration>
+                            <javahClass>org.mikelangelo.osvprocessbuilder.OsvProcessBuilderJni</javahClass>
+                            <javahOutputFilePath>${project.basedir}/src/main/java/org/mikelangelo/osvprocessbuilder/stormy-java/org_mikelangelo_osvprocessbuilder_OsvProcessBuilder.h</javahOutputFilePath>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>native-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <configuration>
+                    <javahOS>linux</javahOS>
+
+                    <sources>
+                        <source>
+                            <directory>src/main/java/org/mikelangelo/osvprocessbuilder/</directory>
+                            <fileNames>
+                                <fileName>libOsvProcessBuilder.c</fileName>
+                            </fileNames>
+                        </source>
+                    </sources>
+                    <compilerProvider>generic-classic</compilerProvider>
+                    <compilerExecutable>gcc</compilerExecutable>
+
+                    <compilerStartOptions>
+                        <compilerStartOption>-m64</compilerStartOption>
+                        <compilerStartOption>-fpic</compilerStartOption>
+                        <compilerStartOption>-Wall</compilerStartOption>
+                        <compilerStartOption>-Wextra</compilerStartOption>
+                        <compilerStartOption>-ansi</compilerStartOption>
+                        <compilerStartOption>-g</compilerStartOption>
+                        <compilerStartOption>-O3</compilerStartOption>
+                    </compilerStartOptions>
+
+                    <linkerOutputDirectory>target</linkerOutputDirectory>
+                    <linkerExecutable>gcc</linkerExecutable>
+
+                    <linkerStartOptions>
+                        <linkerStartOption>-m64</linkerStartOption>
+                        <linkerStartOption>-shared</linkerStartOption>
+                    </linkerStartOptions>
+
+                    <linkerEndOptions>
+                        <linkerEndOption>-o ${project.build.directory}/libOsvProcessBuilder.so</linkerEndOption>
+                    </linkerEndOptions>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>javah_2</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>initialize</goal>
+                            <goal>compile</goal>
+                            <goal>link</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

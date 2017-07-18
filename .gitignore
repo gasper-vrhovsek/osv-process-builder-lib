@@ -1,5 +1,6 @@
 .idea
 target/
+src/main/java/org/mikelangelo/osvprocessbuilder/stormy-java/
 OsvProcessBuilder.iml
 .jar
 .class

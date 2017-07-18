@@ -36,7 +36,7 @@ const char** copy_jni_string_arr(JNIEnv *env, jobject obj, jobjectArray j_arr,
     *arr_len = arrlen;
   }
   arr = (const char**)malloc(sizeof(char**) * (arrlen+1));
-  memset(arr, 0, sizeof(char**) * (arrlen+1)); // in case of strdup error, arr will contain valid pointers and NULLs.
+  memset(arr, 0, sizeof(char**) * (arrlen+1)); /* in case of strdup error, arr will contain valid pointers and NULLs. */
   if(arr==NULL) {
     goto ERROR;
   }

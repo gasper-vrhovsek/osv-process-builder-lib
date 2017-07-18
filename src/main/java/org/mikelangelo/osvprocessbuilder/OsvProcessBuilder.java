@@ -32,16 +32,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         this(Arrays.asList(command));
     }
 
-    // JNI
-    private native int execve(String path, String[] argv, String[] envp, long[] thread_id, int notification_fd);
-
-    public static native long waittid(long thread_id, int[] status, int options);
-
-    static {
-        System.loadLibrary("OsvProcessBuilder");
-    }
-
-    //    // main
+    // main
     public static void main(String[] args) {
         OsvProcessBuilder pb = new OsvProcessBuilder(Arrays.asList(new String[]{"aa", "bb"}));
         long[] thread_id = new long[]{0};
@@ -170,5 +161,13 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         HttpResponse response = httpClient.execute(envPost);
 
         System.out.println(response.toString());
+    }
+
+    private int execve(String path, String[] argv, String[] envp, long[] thread_id, int notification_fd) {
+        return OsvProcessBuilderJni.execve(path, argv, envp, thread_id, notification_fd);
+    }
+
+    public static long waittid(long thread_id, int[] status, int options) {
+        return OsvProcessBuilderJni.waittid(thread_id, status, options);
     }
 }

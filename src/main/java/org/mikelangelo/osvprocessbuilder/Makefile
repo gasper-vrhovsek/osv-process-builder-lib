@@ -27,6 +27,6 @@ jni:
 	java OsvProcessBuilder
 
 $(DEST)/OsvProcessBuilder.so: libOsvProcessBuilder.c
-	#$(JAVAH) -cp ../../../ -d $(DEST) org.mikelangelo.osvprocessbuilder.OsvProcessBuilder
+	$(JAVAH) -cp ../../../ -d $(DEST) org.mikelangelo.osvprocessbuilder.OsvProcessBuilderJni
 	gcc $(CFLAGS) -I$(JAVAD)/include -I$(JAVAD)/include/linux -shared -fPIC libOsvProcessBuilder.c -o $(DEST)/libOsvProcessBuilder.so
 	#$(JAR) -cf osv-process-builder.jar -C $(DEST) org/mikelangelo/osvprocessbuilder/OsvProcess.class -C $(DEST) org/mikelangelo/osvprocessbuilder/OsvProcessBuilder.class
