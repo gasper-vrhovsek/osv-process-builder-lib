@@ -51,7 +51,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         System.out.println("Entering start() method of OsvProcessBuilder.");
 
         HttpClient httpClient = HttpClientBuilder.create().build();
-        String executorIp = "172.16.122.14";
+        String executorIp = "http://172.16.122.14";
 
         //
         String path = m_command.get(0);
