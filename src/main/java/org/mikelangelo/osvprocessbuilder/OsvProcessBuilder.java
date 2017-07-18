@@ -11,6 +11,8 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -51,9 +53,16 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         System.out.println("Entering start() method of OsvProcessBuilder.");
 
         HttpClient httpClient = HttpClientBuilder.create().build();
-        String executorIp = "http://172.16.122.14";
 
-        //
+//        String executorIp = "http://172.16.122.14";
+
+        URI executorEnvUri = null;
+        try {
+            executorEnvUri = new URI("http", null, "172.16.122.14", 8000, "/env", null, null);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
         String path = m_command.get(0);
 
         String[] argv = new String[m_command.size()];
@@ -66,7 +75,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
             //Worker worker = entry.getValue();
             envp[ii] = key + "=" + m_environment.get(key);
             // setup env on executor node
-            setEnvironmentVariable(httpClient, executorIp, key, m_environment.get(key));
+            setEnvironmentVariable(httpClient, executorEnvUri, key, m_environment.get(key));
 
             ii++;
         }
@@ -103,9 +112,14 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         }
 
         // Sending a request to executor node
-        String executorApUrl = executorIp + "/app/";
+        URI executorAppUri = null;
+        try {
+            executorAppUri = new URI("http", null, "172.16.122.14", 8000, "/app", null, null);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
-        HttpPut put = new HttpPut(executorApUrl);
+        HttpPut put = new HttpPut(executorAppUri);
         List<NameValuePair> urlParams = new ArrayList<>();
         urlParams.add(new BasicNameValuePair("command", String.join(" ", argNew)));
 
@@ -149,10 +163,8 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         return false;
     }
 
-    private void setEnvironmentVariable(HttpClient httpClient, String executorIp, String var, String val) throws IOException {
-        String executorEnvUrl = executorIp + "/env/";
-
-        HttpPost envPost = new HttpPost(executorEnvUrl);
+    private void setEnvironmentVariable(HttpClient httpClient, URI executorUri, String var, String val) throws IOException {
+        HttpPost envPost = new HttpPost(executorUri);
         List<NameValuePair> envUrlParams = new ArrayList<>();
         envUrlParams.add(new BasicNameValuePair("var", var));
         envUrlParams.add(new BasicNameValuePair("val", val));
