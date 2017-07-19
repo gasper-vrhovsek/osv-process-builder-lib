@@ -50,7 +50,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
     public OsvProcess start()
             throws IOException {
 
-        System.out.println("Entering start() method of OsvProcessBuilder.");
+        System.out.println("Entering start() method of OsvProcessBuilder. ---- ");
 
         HttpClient httpClient = HttpClientBuilder.create().build();
 
@@ -164,6 +164,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
     }
 
     private void setEnvironmentVariable(HttpClient httpClient, URI executorUri, String var, String val) throws IOException {
+        System.out.println("Setting environment variable: var = " + var + " val = " + val);
+        System.out.println("Sending request to: " + executorUri.toString());
+
         HttpPost envPost = new HttpPost(executorUri);
         List<NameValuePair> envUrlParams = new ArrayList<>();
         envUrlParams.add(new BasicNameValuePair("var", var));
@@ -173,6 +176,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         HttpResponse response = httpClient.execute(envPost);
 
         System.out.println(response.toString());
+        System.out.println(response.getStatusLine());
+        System.out.println(response.getEntity().getContent());
+
     }
 
     private int execve(String path, String[] argv, String[] envp, long[] thread_id, int notification_fd) {
