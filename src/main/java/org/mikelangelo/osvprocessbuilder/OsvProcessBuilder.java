@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -54,15 +55,6 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
         HttpClient httpClient = HttpClientBuilder.create().build();
 
-//        String executorIp = "http://172.16.122.14";
-
-        URI executorEnvUri = null;
-        try {
-            executorEnvUri = new URI("http", null, "172.16.122.14", 8000, "/env", null, null);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
         String path = m_command.get(0);
 
         String[] argv = new String[m_command.size()];
@@ -75,7 +67,11 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
             //Worker worker = entry.getValue();
             envp[ii] = key + "=" + m_environment.get(key);
             // setup env on executor node
-            setEnvironmentVariable(httpClient, executorEnvUri, key, m_environment.get(key));
+            try {
+                setEnvironmentVariable(httpClient, key, m_environment.get(key));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             ii++;
         }
@@ -107,6 +103,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         for (String arg : argvCopy) {
             if (arg != null) {
                 System.out.println("argv[" + i + "] = " + arg);
+                if (i > 1 && argNew[i-1].equals("--hostname")) {
+                    arg = "172.16.122.14";
+                }
                 argNew[i++] = arg;
             }
         }
@@ -163,22 +162,17 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         return false;
     }
 
-    private void setEnvironmentVariable(HttpClient httpClient, URI executorUri, String var, String val) throws IOException {
+    private void setEnvironmentVariable(HttpClient httpClient, String var, String val) throws IOException, InterruptedException {
+        String executorEnvUrl = "http://172.16.122.14:8000/env/" + var + "?val=" + URLEncoder.encode(val, "UTF-8");
+
         System.out.println("Setting environment variable: var = " + var + " val = " + val);
-        System.out.println("Sending request to: " + executorUri.toString());
+        System.out.println("Sending request to: " + executorEnvUrl);
 
-        HttpPost envPost = new HttpPost(executorUri);
-        List<NameValuePair> envUrlParams = new ArrayList<>();
-        envUrlParams.add(new BasicNameValuePair("var", var));
-        envUrlParams.add(new BasicNameValuePair("val", val));
-
-        envPost.setEntity(new UrlEncodedFormEntity(envUrlParams));
+        HttpPost envPost = new HttpPost(executorEnvUrl);
         HttpResponse response = httpClient.execute(envPost);
 
-        System.out.println(response.toString());
         System.out.println(response.getStatusLine());
-        System.out.println(response.getEntity().getContent());
-
+        response.getEntity().getContent().close();
     }
 
     private int execve(String path, String[] argv, String[] envp, long[] thread_id, int notification_fd) {
