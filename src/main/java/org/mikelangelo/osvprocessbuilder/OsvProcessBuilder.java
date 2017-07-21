@@ -102,6 +102,9 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         int i = 0;
         for (String arg : argvCopy) {
             if (arg != null) {
+                if (i > 1 && argNew[i-1].equals("--hostname")) {
+                    arg = "10.10.101.24";
+                }
                 System.out.println("argv[" + i + "] = " + arg);
                 if (i > 1 && argNew[i-1].equals("--hostname")) {
                     arg = "172.16.122.14";
