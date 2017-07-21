@@ -1,20 +1,11 @@
 package org.mikelangelo.osvprocessbuilder;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Justin Cinkelj, Gasper Vrhovsek
@@ -50,11 +41,7 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
     public OsvProcess start()
             throws IOException {
-
-        System.out.println("Entering start() method of OsvProcessBuilder. ---- ");
-
-        HttpClient httpClient = HttpClientBuilder.create().build();
-
+        //
         String path = m_command.get(0);
 
         String[] argv = new String[m_command.size()];
@@ -66,13 +53,6 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         for (String key : m_environment.keySet()) {
             //Worker worker = entry.getValue();
             envp[ii] = key + "=" + m_environment.get(key);
-            // setup env on executor node
-            try {
-                setEnvironmentVariable(httpClient, key, m_environment.get(key));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             ii++;
         }
 
@@ -102,41 +82,14 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
         int i = 0;
         for (String arg : argvCopy) {
             if (arg != null) {
-                if (i > 1 && argNew[i-1].equals("--hostname")) {
-                    arg = "10.10.101.24";
-                }
                 System.out.println("argv[" + i + "] = " + arg);
-                if (i > 1 && argNew[i-1].equals("--hostname")) {
-                    arg = "172.16.122.14";
-                }
                 argNew[i++] = arg;
             }
         }
 
-        // Sending a request to executor node
-        URI executorAppUri = null;
-        try {
-            executorAppUri = new URI("http", null, "172.16.122.14", 8000, "/app", null, null);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        this.execve("/java.so", argNew, envp, thread_id, -1);
 
-        HttpPut put = new HttpPut(executorAppUri);
-        List<NameValuePair> urlParams = new ArrayList<>();
-        urlParams.add(new BasicNameValuePair("command", String.join(" ", argNew)));
-
-        put.setEntity(new UrlEncodedFormEntity(urlParams));
-
-        HttpResponse httpResponse = httpClient.execute(put);
-
-        System.out.println(httpResponse.getStatusLine() + httpResponse.toString());
-        // end of test
-
-
-//        this.execve("/java.so", argNew, envp, thread_id, -1);
-
-//        return new OsvProcess(thread_id[0]);
-        return new OsvProcess(Integer.MAX_VALUE);
+        return new OsvProcess(thread_id[0]);
     }
 
     public File directory() {
@@ -163,19 +116,6 @@ public class OsvProcessBuilder  /* ProcessBuilder */ {
 
     public boolean redirectErrorStream() {
         return false;
-    }
-
-    private void setEnvironmentVariable(HttpClient httpClient, String var, String val) throws IOException, InterruptedException {
-        String executorEnvUrl = "http://172.16.122.14:8000/env/" + var + "?val=" + URLEncoder.encode(val, "UTF-8");
-
-        System.out.println("Setting environment variable: var = " + var + " val = " + val);
-        System.out.println("Sending request to: " + executorEnvUrl);
-
-        HttpPost envPost = new HttpPost(executorEnvUrl);
-        HttpResponse response = httpClient.execute(envPost);
-
-        System.out.println(response.getStatusLine());
-        response.getEntity().getContent().close();
     }
 
     private int execve(String path, String[] argv, String[] envp, long[] thread_id, int notification_fd) {
