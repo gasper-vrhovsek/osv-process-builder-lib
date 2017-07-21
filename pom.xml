@@ -61,7 +61,7 @@
                         </goals>
                         <configuration>
                             <javahClass>org.mikelangelo.osvprocessbuilder.OsvProcessBuilderJni</javahClass>
-                            <javahOutputFilePath>${project.basedir}/src/main/java/org/mikelangelo/osvprocessbuilder/stormy-java/org_mikelangelo_osvprocessbuilder_OsvProcessBuilder.h</javahOutputFilePath>
+                            <javahOutputFilePath>${project.basedir}/src/main/java/org/mikelangelo/osvprocessbuilder/stormy-java/org_mikelangelo_osvprocessbuilder_OsvProcessBuilderJni.h</javahOutputFilePath>
                         </configuration>
                     </execution>
                 </executions>

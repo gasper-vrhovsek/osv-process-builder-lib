@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "stormy-java/org_mikelangelo_osvprocessbuilder_OsvProcessBuilder.h"
+#include "stormy-java/org_mikelangelo_osvprocessbuilder_OsvProcessBuilderJni.h"
 
 int __attribute__((weak)) osv_execve(const char *path, char *const argv[], char *const envp[], long* thread_id, int notification_fd);
 long __attribute__((weak)) osv_waittid(long tid, int *status, int options);
@@ -67,7 +67,7 @@ ERROR:
 }
 
 JNIEXPORT int JNICALL
-Java_org_mikelangelo_osvprocessbuilder_OsvProcessBuilder_execve(JNIEnv *env, jobject obj,
+Java_org_mikelangelo_osvprocessbuilder_OsvProcessBuilderJni_execve(JNIEnv *env, jobject obj,
     jstring j_path, jobjectArray j_argv, jobjectArray j_envp,
     jlongArray j_thread_id, jint j_notification_fd)
 {
@@ -103,7 +103,7 @@ Java_org_mikelangelo_osvprocessbuilder_OsvProcessBuilder_execve(JNIEnv *env, job
 
 
 JNIEXPORT long JNICALL
-Java_org_mikelangelo_osvprocessbuilder_OsvProcessBuilder_waittid(JNIEnv *env, jobject obj,
+Java_org_mikelangelo_osvprocessbuilder_OsvProcessBuilderJni_waittid(JNIEnv *env, jobject obj,
     jlong j_thread_id, jintArray j_status, jint j_options)
 {
   printf("JNI osv_waittid!\n");
