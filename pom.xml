@@ -87,6 +87,7 @@
                     <compilerStartOptions>
                         <compilerStartOption>-fpic</compilerStartOption>
                         <compilerStartOption>-g</compilerStartOption>
+                        <compilerStartOption>-O2</compilerStartOption>
                     </compilerStartOptions>
 
                     <linkerOutputDirectory>target</linkerOutputDirectory>
